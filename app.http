@@ -1,0 +1,108 @@
+### API 1
+
+#### Path: `/todos/`
+
+#### Method: `GET`
+
+GET http://localhost:3000/todos/?status=TO%20DO
+###
+GET http://localhost:3000/todos/?category=WORK&status=DONE
+###
+
+
+GET http://localhost:3000/todos/?category=HOME
+###
+
+
+GET http://localhost:3000/todos/?search_q=Buy
+###
+
+GET http://localhost:3000/todos/?category=LEARNING&priority=HIGH
+###
+
+### API 2
+
+#### Path: `/todos/:todoId/`
+
+#### Method: `GET`
+
+#### Description:
+
+GET http://localhost:3000/todos/1/
+###
+
+
+### API 4
+
+#### Path: `/todos/`
+
+#### Method: `POST`
+
+#### Description:
+
+POST  http://localhost:3000/todos/
+Content-Type: application/json
+
+{
+  "id": 6,
+  "todo": "Finalize event theme",
+  "priority": "LOW",
+  "status": "TO DO",
+  "category": "HOME",
+  "dueDate": "2021-02-22"
+}
+
+###
+
+PUT  http://localhost:3000/todos/1/
+Content-Type: application/json
+
+    {
+      "status": "DONE"
+    }
+
+###
+
+
+PUT  http://localhost:3000/todos/1/
+Content-Type: application/json
+
+    {
+      "priority": "HIGH"
+    }
+
+###
+PUT  http://localhost:3000/todos/1/
+Content-Type: application/json
+
+    {
+      "todo": "Clean the garden"
+    }
+
+###
+PUT  http://localhost:3000/todos/1/
+Content-Type: application/json
+
+    {
+      "category": "LEARNING"
+    }
+
+###
+PUT  http://localhost:3000/todos/1/
+Content-Type: application/json
+
+    {
+      "dueDate": "2021-01-12"
+    }
+
+###
+
+
+### API 6
+
+#### Path: `/todos/:todoId/`
+
+#### Method: `DELETE`
+
+DELETE http://localhost:3000/todos/:todoId
+###
