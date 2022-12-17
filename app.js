@@ -169,15 +169,19 @@ app.get("/todos/:todoId/", async (request, response) => {
 
 app.get("/agenda/", async (request, response) => {
   const { date } = request.query;
+  if (isValid(new Date(date))) {
+    const getSpecificDueDateQuery = `SELECT * FROM todo WHERE 
+        due_date='${formattedDate(date)}';`;
 
-  const getSpecificDueDateQuery = `SELECT * FROM todo WHERE 
-    due_date='${formattedDate(date)}';`;
-
-  const result = await db.all(getSpecificDueDateQuery);
-  const resultList = result.map((object) =>
-    convertDbObjectToResponseObject(object)
-  );
-  response.send(resultList);
+    const result = await db.all(getSpecificDueDateQuery);
+    const resultList = result.map((object) =>
+      convertDbObjectToResponseObject(object)
+    );
+    response.send(resultList);
+  } else {
+    response.status(400);
+    response.send("Invalid Due Date");
+  }
 });
 
 // API 4
