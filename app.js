@@ -24,7 +24,7 @@ const initializeDbAndServer = async () => {
 
 initializeDbAndServer();
 
-const { format, compareAsc } = require("date-fns");
+const { format, isValid } = require("date-fns");
 
 const priorityList = ["HIGH", "MEDIUM", "LOW"];
 const categoryList = ["WORK", "HOME", "LEARNING"];
@@ -82,6 +82,10 @@ const hasSearchQ = (requestQuery) => {
 
 const hasTodo = (requestQuery) => {
   return requestQuery.todo !== undefined;
+};
+
+const hasDueDate = (requestQuery) => {
+  return requestQuery.dueDate !== undefined;
 };
 
 // API 1
@@ -179,10 +183,6 @@ app.get("/agenda/", async (request, response) => {
 // API 4
 app.post("/todos/", async (request, response) => {
   const { id, todo, priority, status, category, dueDate } = request.body;
-  const date = formattedDate(dueDate);
-  const createNewTodoQuery = `INSERT INTO todo 
-  (id,todo,priority,status,category,due_date) VALUES 
-  (${id},'${todo}','${priority}','${status}','${category}','${date}');`;
 
   if (priorityList.includes(priority) === false) {
     response.status(400);
@@ -193,17 +193,18 @@ app.post("/todos/", async (request, response) => {
   } else if (statusList.includes(status) === false) {
     response.status(400);
     response.send("Invalid Todo Status");
-  } else if (date === {}) {
+  } else if (isValid(new Date(dueDate)) === false) {
     response.status(400);
     response.send("Invalid Due Date");
-  } else {
-    try {
-      await db.run(createNewTodoQuery);
-      response.send("Todo Successfully Added");
-    } catch (e) {
-      response.send(e);
-    }
   }
+
+  const createNewTodoQuery = `INSERT INTO todo 
+  (id,todo,priority,status,category,due_date) VALUES 
+  (${id},'${todo}','${priority}','${status}','${category}','${formattedDate(
+    dueDate
+  )}');`;
+  await db.run(createNewTodoQuery);
+  response.send("Todo Successfully Added");
 });
 
 // API 5
@@ -211,12 +212,13 @@ app.post("/todos/", async (request, response) => {
 app.put("/todos/:todoId/", async (request, response) => {
   const { todoId } = request.params;
   const reqQuery = request.body;
-  const { category, status, priority, todo, date } = reqQuery;
+  const { category, status, priority, todo, dueDate } = reqQuery;
+
   let updateTodoQuery;
   if (hasStatus(reqQuery)) {
     if (statusList.includes(reqQuery.status)) {
       updateTodoQuery = `UPDATE todo SET 
-      status = '${status}'  WHERE id = ${todoId}`;
+      status = '${status}'  WHERE id = ${todoId};`;
       await db.run(updateTodoQuery);
       response.send("Status Updated");
     } else {
@@ -226,7 +228,7 @@ app.put("/todos/:todoId/", async (request, response) => {
   } else if (hasCategory(reqQuery)) {
     if (categoryList.includes(reqQuery.category) !== false) {
       updateTodoQuery = `UPDATE todo SET 
-      category = '${category}' WHERE id = ${todoId}`;
+      category = '${category}' WHERE id = ${todoId};`;
       await db.run(updateTodoQuery);
       response.send("Category Updated");
     } else {
@@ -236,7 +238,7 @@ app.put("/todos/:todoId/", async (request, response) => {
   } else if (hasPriority(reqQuery)) {
     if (priorityList.includes(reqQuery.priority)) {
       updateTodoQuery = `UPDATE todo SET 
-      priority = '${priority}' WHERE id = ${todoId}`;
+      priority = '${priority}' WHERE id = ${todoId};`;
       await db.run(updateTodoQuery);
       response.send("Priority Updated");
     } else {
@@ -245,9 +247,20 @@ app.put("/todos/:todoId/", async (request, response) => {
     }
   } else if (hasTodo(reqQuery)) {
     updateTodoQuery = `UPDATE todo SET 
-      todo = '${todo}' WHERE id = ${todoId}`;
+      todo = '${todo}' WHERE id = ${todoId};`;
     await db.run(updateTodoQuery);
     response.send("Todo Updated");
+  } else if (hasDueDate(reqQuery)) {
+    if (isValid(new Date(dueDate))) {
+      updateTodoQuery = `UPDATE todo SET 
+          due_date = '${formattedDate(dueDate)}' 
+          WHERE id = ${todoId};`;
+      await db.run(updateTodoQuery);
+      response.send("Due Date Updated");
+    } else {
+      response.status(400);
+      response.send("Invalid Due Date");
+    }
   }
 });
 
