@@ -196,25 +196,28 @@ app.post("/todos/", async (request, response) => {
   } else if (isValid(new Date(dueDate)) === false) {
     response.status(400);
     response.send("Invalid Due Date");
+  } else {
+    const createNewTodoQuery = `INSERT INTO todo 
+    (id,todo,priority,status,category,due_date) VALUES 
+    (${id},'${todo}','${priority}','${status}','${category}','${formattedDate(
+      dueDate
+    )}');`;
+    await db.run(createNewTodoQuery);
+    response.send("Todo Successfully Added");
   }
-
-  const createNewTodoQuery = `INSERT INTO todo 
-  (id,todo,priority,status,category,due_date) VALUES 
-  (${id},'${todo}','${priority}','${status}','${category}','${formattedDate(
-    dueDate
-  )}');`;
-  await db.run(createNewTodoQuery);
-  response.send("Todo Successfully Added");
 });
 
 // API 5
 
 app.put("/todos/:todoId/", async (request, response) => {
   const { todoId } = request.params;
+
   const reqQuery = request.body;
+
   const { category, status, priority, todo, dueDate } = reqQuery;
 
   let updateTodoQuery;
+
   if (hasStatus(reqQuery)) {
     if (statusList.includes(reqQuery.status)) {
       updateTodoQuery = `UPDATE todo SET 
