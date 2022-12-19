@@ -103,6 +103,11 @@ app.get("/todos/", async (request, response) => {
       response.send("Invalid Todo Status");
     } else {
       query = `SELECT * FROM todo WHERE priority = '${priority}' AND status = '${status}';`;
+      const result = await db.all(query);
+      const resultList = result.map((object) =>
+        convertDbObjectToResponseObject(object)
+      );
+      response.send(resultList);
     }
   } else if (hasCategoryAndStatus(reqQuery)) {
     if (categoryList.includes(category) === false) {
@@ -113,6 +118,11 @@ app.get("/todos/", async (request, response) => {
       response.send("Invalid Todo Status");
     } else {
       query = `SELECT * FROM todo WHERE category = '${category}' AND status = '${status}';`;
+      const result = await db.all(query);
+      const resultList = result.map((object) =>
+        convertDbObjectToResponseObject(object)
+      );
+      response.send(resultList);
     }
   } else if (hasCategoryAndPriority(reqQuery)) {
     if (priorityList.includes(priority) === false) {
@@ -123,17 +133,32 @@ app.get("/todos/", async (request, response) => {
       response.send("Invalid Todo Category");
     } else {
       query = `SELECT * FROM todo WHERE category = '${category}' AND priority = '${priority}';`;
+      const result = await db.all(query);
+      const resultList = result.map((object) =>
+        convertDbObjectToResponseObject(object)
+      );
+      response.send(resultList);
     }
   } else if (hasStatus(reqQuery)) {
-    if (statusList.includes(reqQuery.status)) {
-      query = `SELECT * FROM todo WHERE  status = '${status}';`;
-    } else {
+    if (statusList.includes(reqQuery.status) === false) {
       response.status(400);
       response.send("Invalid Todo Status");
+    } else {
+      query = `SELECT * FROM todo WHERE  status = '${status}';`;
+      const result = await db.all(query);
+      const resultList = result.map((object) =>
+        convertDbObjectToResponseObject(object)
+      );
+      response.send(resultList);
     }
   } else if (hasCategory(reqQuery)) {
     if (categoryList.includes(reqQuery.category)) {
       query = `SELECT * FROM todo WHERE category = '${category}';`;
+      const result = await db.all(query);
+      const resultList = result.map((object) =>
+        convertDbObjectToResponseObject(object)
+      );
+      response.send(resultList);
     } else {
       response.status(400);
       response.send("Invalid Todo Category");
@@ -141,18 +166,23 @@ app.get("/todos/", async (request, response) => {
   } else if (hasPriority(reqQuery)) {
     if (priorityList.includes(reqQuery.priority)) {
       query = `SELECT * FROM todo WHERE priority = '${priority}';`;
+      const result = await db.all(query);
+      const resultList = result.map((object) =>
+        convertDbObjectToResponseObject(object)
+      );
+      response.send(resultList);
     } else {
       response.status(400);
       response.send("Invalid Todo Priority");
     }
   } else if (hasSearchQ(reqQuery)) {
     query = `SELECT * FROM todo WHERE todo LIKE '%${search_q}%';`;
+    const result = await db.all(query);
+    const resultList = result.map((object) =>
+      convertDbObjectToResponseObject(object)
+    );
+    response.send(resultList);
   }
-  const result = await db.all(query);
-  const resultList = result.map((object) =>
-    convertDbObjectToResponseObject(object)
-  );
-  response.send(resultList);
 });
 
 // API 2
