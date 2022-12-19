@@ -106,3 +106,29 @@ Content-Type: application/json
 
 DELETE http://localhost:3000/todos/:todoId
 ###
+
+
+------------------------------------------------------------------------------------------------------------------------------------------------------------
+### API 5
+GET http://localhost:3000/todos/?dueDate=NOT%20DONE
+
+###
+
+GET http://localhost:3000/todos/?status=NOT%20DONE
+
+###
+
+GET http://localhost:3000/todos/?priority=NOT%20DONE
+
+###
+GET http://localhost:3000/todos/?category=NOT%20DONE
+
+###
+
+PUT http://localhost:3000/todos/2/
+Content-Type: application/json
+
+{
+    "dueDate" : "2021-13-12"
+}
+###
